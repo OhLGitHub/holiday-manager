@@ -9,10 +9,16 @@ In addition, the user can search for all holidays (and the weather for each holi
 NAVIGATION
 
 holidays.json
+Includes 7 holidays required by the assessment.
 
-holiday_startercode.py
+holidaymanager.py
+Includes classes and main function.
 
 holidaymanager_flowchartv1.jpg
+A rough draft of the assessment flowchart.
+
+outputjson.json
+The file to which changes are saved.
 
 This code was written as the final assessment for Object Oriented Data Modeling.
 (Dev10, Genesis10)
