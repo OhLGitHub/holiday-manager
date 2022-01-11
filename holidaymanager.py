@@ -12,6 +12,7 @@ import requests
 from dataclasses import dataclass
 import types
 import copy
+from isoweek import Week
 
 # RUBRIC: Can see classes created with meaningful properties and method names.
 # RUBRIC: Uses classes and are creating instances for using their classes.
@@ -61,12 +62,17 @@ class HolidayList:
 
     def findHoliday(self, HolidayName, Date):
         # Find Holiday in innerHolidays
-        for dict in self.innerHolidays:
-            if (list(dict.values())[0] == HolidayName) and (list(dict.values())[1] == datetime.strptime(Date, "%b %d, %Y").date()):
-                # Return Holiday
-                print(f'{HolidayName} is in the list.')
-            else:
-                print("Error: Enter the holiday name as a string, the holiday date as a string in the format 'Jan 01, 2020'")
+        # for dict in self.innerHolidays:
+        #     if (list(dict.values())[0] == HolidayName) and (list(dict.values())[1] == datetime.strptime(Date, "%b %d, %Y").date()):
+        #         # Return Holiday
+        #         print(f'{HolidayName} is in the list.')
+        #     else:
+        #         print("Error: Enter the holiday name as a string, the holiday date as a string in the format 'Jan 01, 2020'")
+        holidayreturn = list(filter(lambda holiday: holiday['name'] == HolidayName and holiday['date'] == datetime.strptime(Date, "%b %d, %Y").date(), self.innerHolidays))
+        if len(holidayreturn)>0:
+            print(holidayreturn[0]['name'], holidayreturn[0]['date'])
+        else:
+            print("Error: The holiday you entered is not in the list.")
 
     def removeHoliday(self, HolidayName, Date): # HolidayName must be a string; Date must be a string in the format 'Jan 01, 2020'
         # Find Holiday in innerHolidays by searching the name and date combination.
@@ -131,12 +137,15 @@ class HolidayList:
     def numHolidays(self):
         return len(self.innerHolidays) # Return the total number of holidays in innerHolidays
     
-    # def filter_holidays_by_week(year, week_number):
-    #     # Use a Lambda function to filter by week number and save this as holidays, use the filter on innerHolidays
-    #     filter(lambda weeknumber: weeknumber == week_number, HolidayList().innerHolidays)
-    #     # Week number is part of the the Datetime object
-    #     # Cast filter results as list
-    #     # return your holidays
+    def filter_holidays_by_week(self, year, week_number):
+        niceprint = '' # cool hack from Tom
+        w = Week(year, week_number)
+        holidays_in_week = list(filter(lambda holiday: w.contains(holiday['date']), self.innerHolidays))
+        for holiday in holidays_in_week: #scope only in for loop
+            niceprintname = holiday['name']
+            niceprintdate = holiday['date'].strftime("%Y-%m-%d")
+            niceprint = niceprint + f'{niceprintname} ({niceprintdate})\n'
+        return niceprint
 
     # def displayHolidaysInWeek(holidayList):
     #     # Use your filter_holidays_by_week to get list of holidays within a week as a parameter
@@ -237,9 +246,23 @@ Your changes have been saved.
             print(f'''
 View Holidays
 =================
+1. Find a Holiday
+2. View all Holidays in a Given Week
         ''')
-            pprint(HolListObj.innerHolidays)
-            continue
+            view_choice = str(input('Type 1 to Find, 2 for a Given Week: ')).strip() # strip spaces from user input
+            if view_choice == '1':
+                view_namestring = str(input('Name: ')).strip() # strip spaces from user input
+                view_datestring = str(input('Date: ')).strip() # strip spaces from user input
+                HolListObj.findHoliday(view_namestring, view_datestring)
+                continue
+            elif view_choice == '2':
+                view_year = int(input('Year (as a number XXXX): '))
+                view_week = int(input('Week (as a number from 1-52): '))
+                print(HolListObj.filter_holidays_by_week(view_year, view_week))
+                continue
+            else:
+                print('Error: you did not follow directions.')
+                continue
         elif choice == '5':
             if no_changes == True:
                 print('''
